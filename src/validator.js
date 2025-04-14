@@ -29,16 +29,16 @@ export class Validator {
 	validate(rootFile, rootPath, assetMap, response) {
 		// TODO: This duplicates a request of the three.js loader, and could
 		// take advantage of THREE.Cache after r90.
-		return fetch(rootFile)
-			.then((response) => response.arrayBuffer())
-			.then((buffer) =>
-				validateBytes(new Uint8Array(buffer), {
-					externalResourceFunction: (uri) =>
-						this.resolveExternalResource(uri, rootFile, rootPath, assetMap),
-				}),
-			)
-			.then((report) => this.setReport(report, response))
-			.catch((e) => this.setReportException(e));
+		// return fetch(rootFile)
+		// 	.then((response) => response.arrayBuffer())
+		// 	.then((buffer) =>
+		// 		validateBytes(new Uint8Array(buffer), {
+		// 			externalResourceFunction: (uri) =>
+		// 				this.resolveExternalResource(uri, rootFile, rootPath, assetMap),
+		// 		}),
+		// 	)
+		// 	.then((report) => this.setReport(report, response))
+		// 	.catch((e) => this.setReportException(e));
 	}
 
 	/**

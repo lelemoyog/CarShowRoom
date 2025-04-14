@@ -524,42 +524,23 @@ export class Viewer {
 		}));
 
 		// Display controls.
-		const dispFolder = gui.addFolder('Display');
-		const envBackgroundCtrl = dispFolder.add(this.state, 'background');
+		// const dispFolder = gui.addFolder('Display');
+		const envBackgroundCtrl = gui.add(this.state, 'background');
 		envBackgroundCtrl.onChange(() => this.updateEnvironment());
-		const autoRotateCtrl = dispFolder.add(this.state, 'autoRotate');
+		const autoRotateCtrl = gui.add(this.state, 'autoRotate');
 		autoRotateCtrl.onChange(() => this.updateDisplay());
-		const wireframeCtrl = dispFolder.add(this.state, 'wireframe');
+		const wireframeCtrl = gui.add(this.state, 'wireframe');
 		wireframeCtrl.onChange(() => this.updateDisplay());
-		const skeletonCtrl = dispFolder.add(this.state, 'skeleton');
-		skeletonCtrl.onChange(() => this.updateDisplay());
-		const gridCtrl = dispFolder.add(this.state, 'grid');
-		gridCtrl.onChange(() => this.updateDisplay());
-		dispFolder.add(this.controls, 'screenSpacePanning');
-		const pointSizeCtrl = dispFolder.add(this.state, 'pointSize', 1, 16);
-		pointSizeCtrl.onChange(() => this.updateDisplay());
-		const bgColorCtrl = dispFolder.addColor(this.state, 'bgColor');
-		bgColorCtrl.onChange(() => this.updateBackground());
-
-		// Lighting controls.
-		const lightFolder = gui.addFolder('Lighting');
-		const envMapCtrl = lightFolder.add(
+		
+		const envMapCtrl = gui.add(
 			this.state,
 			'environment',
 			environments.map((env) => env.name),
 		);
 		envMapCtrl.onChange(() => this.updateEnvironment());
 		[
-			lightFolder.add(this.state, 'toneMapping', {
-				Linear: LinearToneMapping,
-				'ACES Filmic': ACESFilmicToneMapping,
-			}),
-			lightFolder.add(this.state, 'exposure', -10, 10, 0.01),
-			lightFolder.add(this.state, 'punctualLights').listen(),
-			lightFolder.add(this.state, 'ambientIntensity', 0, 2),
-			lightFolder.addColor(this.state, 'ambientColor'),
-			lightFolder.add(this.state, 'directIntensity', 0, 4), // TODO(#116)
-			lightFolder.addColor(this.state, 'directColor'),
+			
+			// gui.addColor(this.state, 'directColor'),
 		].forEach((ctrl) => ctrl.onChange(() => this.updateLights()));
 
 		// Animation controls.
@@ -579,13 +560,7 @@ export class Viewer {
 		this.cameraFolder = gui.addFolder('Cameras');
 		this.cameraFolder.domElement.style.display = 'none';
 
-		// Stats.
-		const perfFolder = gui.addFolder('Performance');
-		const perfLi = document.createElement('li');
-		this.stats.dom.style.position = 'static';
-		perfLi.appendChild(this.stats.dom);
-		perfLi.classList.add('gui-stats');
-		perfFolder.__ul.appendChild(perfLi);
+		
 
 		const guiWrap = document.createElement('div');
 		this.el.appendChild(guiWrap);
@@ -675,6 +650,8 @@ export class Viewer {
 		}
 	}
 
+
+
 	clear() {
 		if (!this.content) return;
 
@@ -695,6 +672,205 @@ export class Viewer {
 				}
 			}
 		});
+	}
+}
+
+
+//create a color picker on select vehicle changes color
+function createColorPicker(callback) {
+	const colorInput = document.createElement('input');
+	colorInput.type = 'color';
+	colorInput.style.position = 'absolute';
+	colorInput.style.top = '30px';
+	colorInput.style.left = '10px';
+	colorInput.style.zIndex = 1000;
+
+	colorInput.oninput = () => {
+		callback(colorInput.value);
+	};
+
+	document.body.appendChild(colorInput);
+}
+
+createColorPicker((color) => {
+	const selectedObject = window.VIEWER.scene;
+	if (selectedObject) {
+		selectedObject.traverse((node) => {
+			if (node.isMesh) {
+				node.material.color.set(color);
+			}
+		});
+	}
+});
+
+
+	// help me create a button on screen
+	function createButton(text, callback) {
+		const container = document.createElement('div');
+		container.style.position = 'absolute';
+		container.style.top = '70px';
+		container.style.left = '10px';
+		container.style.zIndex = 1000;
+	
+		const button = document.createElement('button');
+		button.innerText = text;
+		button.style.padding = '8px';
+		button.style.cursor = 'pointer';
+		button.style.backgroundColor = 'black';
+		button.style.color = 'white';
+	
+		const dropdown = document.createElement('div');
+		dropdown.style.display = 'none';
+		dropdown.style.position = 'absolute';
+		dropdown.style.backgroundColor = 'black';
+		dropdown.style.color = 'white';
+		dropdown.style.border = '1px solid #ccc';
+		dropdown.style.boxShadow = '0px 2px 5px rgba(0,0,0,0.2)';
+		dropdown.style.marginTop = '5px';
+	
+		const options = [
+			'Benz GLE',
+			'G-Wagon',
+			'Ford Master NG',
+			'Russian Army Truck'
+		];
+
+		 let numberOfOptions = 0;
+	
+		options.forEach(option => {
+			const item = document.createElement('div');
+			item.innerText = option;
+			item.style.padding = '8px';
+			item.style.cursor = 'pointer';
+			item.value = numberOfOptions;
+			numberOfOptions++;
+	
+			item.onmouseenter = () => item.style.backgroundColor = '#f0f0f0';
+			item.onmouseleave = () => item.style.backgroundColor = '#fff';
+	
+			item.onclick = () => {
+				dropdown.style.display = 'none';
+				callback(option);  // Call the callback with selected option
+			};
+	
+			dropdown.appendChild(item);
+		});
+	
+		button.onclick = () => {
+			dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+		};
+	
+		container.appendChild(button);
+		container.appendChild(dropdown);
+		document.body.appendChild(container);
+	}
+	
+// how do i use this button?
+createButton('Select Vehicle', (selectedOption) => {
+	console.log('Selected:', selectedOption);
+	// You can trigger your vehicle loading or viewer logic here
+	if (selectedOption === 'Benz GLE') {
+		createDropzone2('mercedes_glb_amg.glb');
+		let specs = {
+			make: 'Mercedes-Benz',
+			model: 'GLE',
+			mileage: '30,000 km',
+			price: '60,000',
+			driveType: 'AWD',
+		};
+		createSpecsBox(specs);
+	} else if (selectedOption === 'G-Wagon') {
+		createDropzone2('2020_mercedes-benz_g-class_amg_g_63.glb');
+		let specs = {
+			make: 'Mercedes-Benz',
+			model: 'G-Wagon',
+			mileage: '20,000 km',
+			price: '150,000',
+			driveType: 'AWD',
+		};
+		createSpecsBox(specs);
+	} else if (selectedOption === 'Ford Master NG') {
+		createDropzone2('car_glb.glb');
+		let specs = {
+			make: 'Ford',
+			model: 'Master NG',
+			mileage: '40,000 km',
+			price: '25,000',
+			driveType: 'FWD',
+		};
+		createSpecsBox(specs);
+	} else if (selectedOption === 'Russian Army Truck') {
+		createDropzone2('unnecessarily_ridiculous_truck.glb');
+		let specs = {
+			make: 'Russian Army',
+			model: 'Truck',
+			mileage: '100,000 km',
+			price: '15,000',
+			driveType: 'AWD',
+		};
+		createSpecsBox(specs);
+	}
+});
+
+
+//crete a text box show the cars specs Make: Toyota
+// Model: 2002
+// Mileage: 40000
+// Price: 12000.0
+// Drive type: 4WD
+// function shoul take in the car specs and create a text box
+
+function createSpecsBox(specs) {
+	const specsBox = document.createElement('div');
+	specsBox.style.position = 'absolute';
+	specsBox.style.top = '300px';
+	specsBox.style.left = '10px';
+	specsBox.style.zIndex = 1000;
+	specsBox.style.backgroundColor = 'black';
+	specsBox.style.color = 'white';
+	specsBox.style.border = '1px solid #ccc';
+	specsBox.style.padding = '10px';
+	specsBox.style.boxShadow = '0px 2px 5px rgba(0,0,0,0.2)';
+	specsBox.innerText = `
+		Make: ${specs.make}
+		Model: ${specs.model}
+		Mileage: ${specs.mileage}
+		Price: ${specs.price}
+		Drive type: ${specs.driveType}
+	`;
+
+	document.body.appendChild(specsBox);
+}
+
+
+
+//how do add event listener to the button?
+async function createDropzone2(fil0Path) {
+	const filePath = 'models/' + fil0Path; // Path to the saved file in the models folder
+	const fileMap = new Map();
+
+	try {
+		// Fetch the file from the server
+		const response = await fetch(filePath);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch file at ${filePath}: ${response.statusText}`);
+		}
+
+		// Convert the response to a Blob
+		const blob = await response.blob();
+
+		// Create a File object and add it to the fileMap
+		const file = new File([blob], 'cra.glb');
+		fileMap.set(filePath, file);
+
+		// Call the load method with the fileMap
+		//this.showSpinner();
+		var app = window.VIEWER.app;
+		app.load(fileMap);
+		//this.hideSpinner();
+	} catch (error) {
+		console.error(error);
+		app.hideSpinner();
 	}
 }
 

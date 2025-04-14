@@ -4,6 +4,8 @@ import { SimpleDropzone } from 'simple-dropzone';
 import { Validator } from './validator.js';
 import { Footer } from './components/footer';
 import queryString from 'query-string';
+import fs from 'fs';
+import path from 'path';
 
 window.VIEWER = {};
 
@@ -12,6 +14,9 @@ if (!(window.File && window.FileReader && window.FileList && window.Blob)) {
 } else if (!WebGL.isWebGLAvailable()) {
 	console.error('WebGL is not supported in this browser.');
 }
+
+
+
 
 class App {
 	/**
@@ -49,15 +54,35 @@ class App {
 			this.view(options.model, '', new Map());
 		}
 	}
-
 	/**
-	 * Sets up the drag-and-drop controller.
-	 */
-	createDropzone() {
-		const dropCtrl = new SimpleDropzone(this.dropEl, this.inputEl);
-		dropCtrl.on('drop', ({ files }) => this.load(files));
-		dropCtrl.on('dropstart', () => this.showSpinner());
-		dropCtrl.on('droperror', () => this.hideSpinner());
+ * Sets up the file loader to read from the 'models' folder.
+ */
+	async createDropzone() {
+		const filePath = 'models/ram.glb'; // Path to the saved file in the models folder
+		const fileMap = new Map();
+
+		try {
+			// Fetch the file from the server
+			const response = await fetch(filePath);
+			if (!response.ok) {
+				throw new Error(`Failed to fetch file at ${filePath}: ${response.statusText}`);
+			}
+
+			// Convert the response to a Blob
+			const blob = await response.blob();
+
+			// Create a File object and add it to the fileMap
+			const file = new File([blob], 'cra.glb');
+			fileMap.set(filePath, file);
+
+			// Call the load method with the fileMap
+			this.showSpinner();
+			this.load(fileMap);
+			this.hideSpinner();
+		} catch (error) {
+			console.error(error);
+			this.hideSpinner();
+		}
 	}
 
 	/**
@@ -72,6 +97,10 @@ class App {
 		this.viewer = new Viewer(this.viewerEl, this.options);
 		return this.viewer;
 	}
+
+	
+	
+
 
 	/**
 	 * Loads a fileset provided by user action.
@@ -150,11 +179,72 @@ class App {
 	}
 }
 
-document.body.innerHTML += Footer();
+
+//how do add event listener to the button?
+async function createDropzone2(fil0Path) {
+	const filePath = 'models/' + fil0Path; // Path to the saved file in the models folder
+	const fileMap = new Map();
+
+	try {
+		// Fetch the file from the server
+		const response = await fetch(filePath);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch file at ${filePath}: ${response.statusText}`);
+		}
+
+		// Convert the response to a Blob
+		const blob = await response.blob();
+
+		// Create a File object and add it to the fileMap
+		const file = new File([blob], 'cra.glb');
+		fileMap.set(filePath, file);
+
+		// Call the load method with the fileMap
+		//this.showSpinner();
+		this.load(fileMap);
+		//this.hideSpinner();
+	} catch (error) {
+		console.error(error);
+		this.hideSpinner();
+	}
+}
+
+function createSpecsBox(specs) {
+	const specsBox = document.createElement('div');
+	specsBox.style.position = 'absolute';
+	specsBox.style.top = '300px';
+	specsBox.style.left = '10px';
+	specsBox.style.zIndex = 1000;
+	specsBox.style.backgroundColor = 'black';
+	specsBox.style.color = 'white';
+	specsBox.style.border = '1px solid #ccc';
+	specsBox.style.padding = '10px';
+	specsBox.style.boxShadow = '0px 2px 5px rgba(0,0,0,0.2)';
+	specsBox.innerText = `
+		Make: ${specs.make}
+		Model: ${specs.model}
+		Mileage: ${specs.mileage}
+		Price: ${specs.price}
+		Drive type: ${specs.driveType}
+	`;
+
+	document.body.appendChild(specsBox);
+}
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
 	const app = new App(document.body, location);
 
+	app.createDropzone();
+	let specs = {
+		make:'Ford',
+		model:'F-550',
+		mileage:'10000',
+		price:'$100000',
+		driveType:'4WD',
+	};
+	createSpecsBox(specs);
 	window.VIEWER.app = app;
 
 	console.info('[glTF Viewer] Debugging data exported as `window.VIEWER`.');
