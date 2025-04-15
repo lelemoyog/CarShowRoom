@@ -180,34 +180,6 @@ class App {
 }
 
 
-//how do add event listener to the button?
-async function createDropzone2(fil0Path) {
-	const filePath = 'models/' + fil0Path; // Path to the saved file in the models folder
-	const fileMap = new Map();
-
-	try {
-		// Fetch the file from the server
-		const response = await fetch(filePath);
-		if (!response.ok) {
-			throw new Error(`Failed to fetch file at ${filePath}: ${response.statusText}`);
-		}
-
-		// Convert the response to a Blob
-		const blob = await response.blob();
-
-		// Create a File object and add it to the fileMap
-		const file = new File([blob], 'cra.glb');
-		fileMap.set(filePath, file);
-
-		// Call the load method with the fileMap
-		//this.showSpinner();
-		this.load(fileMap);
-		//this.hideSpinner();
-	} catch (error) {
-		console.error(error);
-		this.hideSpinner();
-	}
-}
 
 function createSpecsBox(specs) {
 	const specsBox = document.createElement('div');

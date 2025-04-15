@@ -183,7 +183,7 @@ export class Viewer {
 			MANAGER.setURLModifier((url, path) => {
 				// URIs in a glTF file may be escaped, or not. Assume that assetMap is
 				// from an un-escaped source, and decode all URIs before lookups.
-				
+
 				const normalizedURL =
 					rootPath +
 					decodeURI(url)
@@ -220,7 +220,7 @@ export class Viewer {
 						// Valid, but not supported by this viewer.
 						throw new Error(
 							'This model contains no scene, and cannot be viewed here. However,' +
-								' it may contain individual 3D resources.',
+							' it may contain individual 3D resources.',
 						);
 					}
 
@@ -253,7 +253,7 @@ export class Viewer {
 		this.controls.reset();
 
 		object.position.x -= center.x;
-		object.position.y -= ( center.y + size / 10.0);
+		object.position.y -= (center.y + size / 10.0);
 		object.position.z -= center.z;
 
 		this.controls.maxDistance = size * 10;
@@ -529,7 +529,7 @@ export class Viewer {
 		autoRotateCtrl.onChange(() => this.updateDisplay());
 		const wireframeCtrl = gui.add(this.state, 'wireframe');
 		wireframeCtrl.onChange(() => this.updateDisplay());
-		
+
 		const envMapCtrl = gui.add(
 			this.state,
 			'environment',
@@ -537,7 +537,7 @@ export class Viewer {
 		);
 		envMapCtrl.onChange(() => this.updateEnvironment());
 		[
-			
+
 			// gui.addColor(this.state, 'directColor'),
 		].forEach((ctrl) => ctrl.onChange(() => this.updateLights()));
 
@@ -558,7 +558,7 @@ export class Viewer {
 		this.cameraFolder = gui.addFolder('Cameras');
 		this.cameraFolder.domElement.style.display = 'none';
 
-		
+
 
 		const guiWrap = document.createElement('div');
 		this.el.appendChild(guiWrap);
@@ -702,67 +702,67 @@ createColorPicker((color) => {
 });
 
 
-	// help me create a button on screen
-	function createButton(text, callback) {
-		const container = document.createElement('div');
-		container.style.position = 'absolute';
-		container.style.top = '70px';
-		container.style.left = '10px';
-		container.style.zIndex = 1000;
-	
-		const button = document.createElement('button');
-		button.innerText = text;
-		button.style.padding = '8px';
-		button.style.cursor = 'pointer';
-		button.style.backgroundColor = 'black';
-		button.style.color = 'white';
-	
-		const dropdown = document.createElement('div');
-		dropdown.style.display = 'none';
-		dropdown.style.position = 'absolute';
-		dropdown.style.backgroundColor = 'white';
-		dropdown.style.color = 'black';
-		dropdown.style.border = '1px solid #ccc';
-		dropdown.style.boxShadow = '0px 2px 5px rgba(0,0,0,0.2)';
-		dropdown.style.marginTop = '5px';
-	
-		const options = [
-			'Benz GLE',
-			'G-Wagon',
-			'Ford Master NG',
-			'Russian Army Truck'
-		];
+// help me create a button on screen
+function createButton(text, callback) {
+	const container = document.createElement('div');
+	container.style.position = 'absolute';
+	container.style.top = '70px';
+	container.style.left = '10px';
+	container.style.zIndex = 1000;
 
-		 let numberOfOptions = 0;
-	
-		options.forEach(option => {
-			const item = document.createElement('div');
-			item.innerText = option;
-			item.style.padding = '8px';
-			item.style.cursor = 'pointer';
-			item.value = numberOfOptions;
-			numberOfOptions++;
-	
-			item.onmouseenter = () => item.style.backgroundColor = '#f0f0f0';
-			item.onmouseleave = () => item.style.backgroundColor = '#fff';
-	
-			item.onclick = () => {
-				dropdown.style.display = 'none';
-				callback(option);  // Call the callback with selected option
-			};
-	
-			dropdown.appendChild(item);
-		});
-	
-		button.onclick = () => {
-			dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+	const button = document.createElement('button');
+	button.innerText = text;
+	button.style.padding = '8px';
+	button.style.cursor = 'pointer';
+	button.style.backgroundColor = 'black';
+	button.style.color = 'white';
+
+	const dropdown = document.createElement('div');
+	dropdown.style.display = 'none';
+	dropdown.style.position = 'absolute';
+	dropdown.style.backgroundColor = 'white';
+	dropdown.style.color = 'black';
+	dropdown.style.border = '1px solid #ccc';
+	dropdown.style.boxShadow = '0px 2px 5px rgba(0,0,0,0.2)';
+	dropdown.style.marginTop = '5px';
+
+	const options = [
+		'Benz GLE',
+		'G-Wagon',
+		'Ford Master NG',
+		'Russian Army Truck'
+	];
+
+	let numberOfOptions = 0;
+
+	options.forEach(option => {
+		const item = document.createElement('div');
+		item.innerText = option;
+		item.style.padding = '8px';
+		item.style.cursor = 'pointer';
+		item.value = numberOfOptions;
+		numberOfOptions++;
+
+		item.onmouseenter = () => item.style.backgroundColor = '#f0f0f0';
+		item.onmouseleave = () => item.style.backgroundColor = '#fff';
+
+		item.onclick = () => {
+			dropdown.style.display = 'none';
+			callback(option);  // Call the callback with selected option
 		};
-	
-		container.appendChild(button);
-		container.appendChild(dropdown);
-		document.body.appendChild(container);
-	}
-	
+
+		dropdown.appendChild(item);
+	});
+
+	button.onclick = () => {
+		dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+	};
+
+	container.appendChild(button);
+	container.appendChild(dropdown);
+	document.body.appendChild(container);
+}
+
 // how do i use this button?
 createButton('Select Vehicle', (selectedOption) => {
 	console.log('Selected:', selectedOption);
@@ -866,6 +866,29 @@ function createImage(imagePath) {
 		image.style.cursor = 'grabbing';
 	});
 
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
+
 	// Mouse up: stop dragging
 	document.addEventListener('mouseup', () => {
 		isDragging = false;
@@ -915,6 +938,29 @@ function createImage2(imagePath) {
 		offsetY = e.clientY - image.offsetTop;
 		image.style.cursor = 'grabbing';
 	});
+
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
 
 	// Mouse up: stop dragging
 	document.addEventListener('mouseup', () => {
@@ -979,6 +1025,28 @@ function createImage3(imagePath) {
 		}
 	});
 
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
 	// Scroll to resize
 	image.addEventListener('wheel', (e) => {
 		e.preventDefault();
@@ -1016,10 +1084,10 @@ async function createDropzone2(fil0Path) {
 		fileMap.set(filePath, file);
 
 		// Call the load method with the fileMap
-		//this.showSpinner();
+		app.showSpinner();
 		var app = window.VIEWER.app;
 		app.load(fileMap);
-		//this.hideSpinner();
+		app.hideSpinner();
 	} catch (error) {
 		console.error(error);
 		app.hideSpinner();

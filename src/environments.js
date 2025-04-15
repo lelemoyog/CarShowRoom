@@ -11,7 +11,7 @@ export const environments = [
 	},
 	{
 		id: 'venice-sunset',
-		name: 'Venice Sunset',
+		name: 'parking lot',
 		path: 'models/killesberg_park_4k.exr',
 		format: '.exr',
 	},
