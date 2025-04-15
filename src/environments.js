@@ -4,21 +4,21 @@ export const environments = [
 	// 	name: 'None',
 	// 	path: null,
 	// },
-	// {
-	// 	id: 'neutral', // THREE.RoomEnvironment
-	// 	name: 'Neutral',
-	// 	path: null,
-	// },
+	{
+		id: 'autumn_crossing_4k', // THREE.RoomEnvironment
+		name: 'green field',
+		path: 'models/autumn_crossing_4k.exr',
+	},
 	{
 		id: 'venice-sunset',
 		name: 'Venice Sunset',
-		path: 'models/pic_spot01_sd021.exr',
+		path: 'models/killesberg_park_4k.exr',
 		format: '.exr',
 	},
 	{
 		id: 'footprint-court',
 		name: 'Footprint Court (HDR Labs)',
-		path: 'models/Texas-Bluebonnet-Field.exr',
+		path: 'models/pic_spot01_sd021.exr',
 		format: '.exr',
 	},
 ];

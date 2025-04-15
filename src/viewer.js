@@ -255,7 +255,7 @@ export class Viewer {
 		this.controls.reset();
 
 		object.position.x -= center.x;
-		object.position.y -= center.y;
+		object.position.y -= ( center.y + size / 10.0);
 		object.position.z -= center.z;
 
 		this.controls.maxDistance = size * 10;
@@ -676,7 +676,7 @@ export class Viewer {
 }
 
 
-//create a color picker on select vehicle changes color
+//a color picker on select vehicle changes color
 function createColorPicker(callback) {
 	const colorInput = document.createElement('input');
 	colorInput.type = 'color';
