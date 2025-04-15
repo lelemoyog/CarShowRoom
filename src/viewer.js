@@ -183,7 +183,7 @@ export class Viewer {
 			MANAGER.setURLModifier((url, path) => {
 				// URIs in a glTF file may be escaped, or not. Assume that assetMap is
 				// from an un-escaped source, and decode all URIs before lookups.
-				// See: https://github.com/donmccurdy/three-gltf-viewer/issues/146
+				
 				const normalizedURL =
 					rootPath +
 					decodeURI(url)
@@ -228,8 +228,6 @@ export class Viewer {
 
 					blobURLs.forEach(URL.revokeObjectURL);
 
-					// See: https://github.com/google/draco/issues/349
-					// DRACOLoader.releaseDecoderModule();
 
 					resolve(gltf);
 				},
@@ -246,7 +244,7 @@ export class Viewer {
 	setContent(object, clips) {
 		this.clear();
 
-		object.updateMatrixWorld(); // donmccurdy/three-gltf-viewer#330
+		object.updateMatrixWorld(); //
 
 		const box = new Box3().setFromObject(object);
 		const size = box.getSize(new Vector3()).length();
@@ -722,8 +720,8 @@ createColorPicker((color) => {
 		const dropdown = document.createElement('div');
 		dropdown.style.display = 'none';
 		dropdown.style.position = 'absolute';
-		dropdown.style.backgroundColor = 'black';
-		dropdown.style.color = 'white';
+		dropdown.style.backgroundColor = 'white';
+		dropdown.style.color = 'black';
 		dropdown.style.border = '1px solid #ccc';
 		dropdown.style.boxShadow = '0px 2px 5px rgba(0,0,0,0.2)';
 		dropdown.style.marginTop = '5px';
@@ -775,7 +773,7 @@ createButton('Select Vehicle', (selectedOption) => {
 			make: 'Mercedes-Benz',
 			model: 'GLE',
 			mileage: '30,000 km',
-			price: '60,000',
+			price: '$60,000',
 			driveType: 'AWD',
 		};
 		createSpecsBox(specs);
@@ -785,7 +783,7 @@ createButton('Select Vehicle', (selectedOption) => {
 			make: 'Mercedes-Benz',
 			model: 'G-Wagon',
 			mileage: '20,000 km',
-			price: '150,000',
+			price: '$150,000',
 			driveType: 'AWD',
 		};
 		createSpecsBox(specs);
@@ -795,7 +793,7 @@ createButton('Select Vehicle', (selectedOption) => {
 			make: 'Ford',
 			model: 'Master NG',
 			mileage: '40,000 km',
-			price: '25,000',
+			price: '$25,000',
 			driveType: 'FWD',
 		};
 		createSpecsBox(specs);
@@ -805,7 +803,7 @@ createButton('Select Vehicle', (selectedOption) => {
 			make: 'Russian Army',
 			model: 'Truck',
 			mileage: '100,000 km',
-			price: '15,000',
+			price: '$15,000',
 			driveType: 'AWD',
 		};
 		createSpecsBox(specs);
@@ -842,7 +840,161 @@ function createSpecsBox(specs) {
 	document.body.appendChild(specsBox);
 }
 
+function createImage(imagePath) {
+	const image = document.createElement('img');
+	image.src = imagePath;
+	image.style.position = 'absolute';
+	image.style.top = '100px';
+	image.style.left = '10px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+	//float image to the left
+	image.style.float = 'left';
 
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+
+function createImage2(imagePath) {
+	const image = document.createElement('img');
+	image.src = imagePath;
+	image.style.position = 'absolute';
+	image.style.top = '100px';
+	image.style.left = '10px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+function createImage3(imagePath) {
+	const image = document.createElement('img');
+	image.src = imagePath;
+	image.style.position = 'absolute';
+	image.style.top = '100px';
+	image.style.left = '10px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+
+
+createImage("models/3d-flower.png");
+createImage2("models/close-up-colorful.png");
+createImage3("models/beautiful-flower.png");
 
 //how do add event listener to the button?
 async function createDropzone2(fil0Path) {
