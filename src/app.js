@@ -40,7 +40,7 @@ class App {
 		this.inputEl = el.querySelector('#file-input');
 		this.validator = new Validator(el);
 
-		this.createDropzone();
+		//this.createDropzone();
 		this.hideSpinner();
 
 		const options = this.options;
@@ -84,6 +84,35 @@ class App {
 			this.hideSpinner();
 		}
 	}
+
+	//how do add event listener to the button?
+async  createDropzone2(fil0Path) {
+	const filePath = 'models/' + fil0Path; // Path to the saved file in the models folder
+	const fileMap = new Map();
+
+	try {
+		// Fetch the file from the server
+		const response = await fetch(filePath);
+		if (!response.ok) {
+			throw new Error(`Failed to fetch file at ${filePath}: ${response.statusText}`);
+		}
+
+		// Convert the response to a Blob
+		const blob = await response.blob();
+
+		// Create a File object and add it to the fileMap
+		const file = new File([blob], 'cra.glb');
+		fileMap.set(filePath, file);
+
+		// Call the load method with the fileMap
+		//this.showSpinner();
+		this.load(fileMap);
+		//this.hideSpinner();
+	} catch (error) {
+		console.error(error);
+		this.hideSpinner();
+	}
+}
 
 	/**
 	 * Sets up the view manager.
@@ -181,10 +210,11 @@ class App {
 
 
 
+
 function createSpecsBox(specs) {
 	const specsBox = document.createElement('div');
 	specsBox.style.position = 'absolute';
-	specsBox.style.top = '300px';
+	specsBox.style.bottom = '10px';
 	specsBox.style.left = '10px';
 	specsBox.style.zIndex = 1000;
 	specsBox.style.backgroundColor = 'black';
@@ -208,10 +238,11 @@ function createSpecsBox(specs) {
 document.addEventListener('DOMContentLoaded', () => {
 	const app = new App(document.body, location);
 
+	//app.createDropzone2("Coreopsis-Flower.glb")
 	app.createDropzone();
 	let specs = {
 		make:'Ford',
-		model:'F-550',
+		model:'F-550 Truck',
 		mileage:'10000',
 		price:'$100000',
 		driveType:'4WD',

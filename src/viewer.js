@@ -30,6 +30,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { EXRLoader } from 'three/addons/loaders/EXRLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
+
 import { GUI } from 'dat.gui';
 
 import { environments } from './environments.js';
@@ -702,6 +703,34 @@ createColorPicker((color) => {
 });
 
 
+//create a function that when called will RANDOMLY resize and change the color of the model 	
+
+function  randomizeModel() {
+	const selectedObject = window.VIEWER.scene;
+	drawScene()
+	drawScene2()
+	drawScene3()
+	drawScene4()
+	drawScene5()
+	drawScene6()
+	if (selectedObject) {
+		 // Randomize scale uniformly without distorting the shape (keeps the geometry intact)
+		  const randomScale = Math.random() * 2 + 0.5; // Random scale between 0.5 and 2.5
+		  selectedObject.scale.set(randomScale, randomScale, randomScale);
+	  selectedObject.traverse((node) => {
+		if (node.isMesh) {
+		
+  
+		  // Randomize color (like using a color picker)
+		  if (node.material && node.material.color) {
+			node.material.color.set(Math.random() * 0xffffff); // Random color (0xFFFFFF represents full RGB range)
+		  }
+		}
+	  });
+	}
+  }
+  
+
 // help me create a button on screen
 function createButton(text, callback) {
 	const container = document.createElement('div');
@@ -729,8 +758,10 @@ function createButton(text, callback) {
 	const options = [
 		'Benz GLE',
 		'G-Wagon',
+		'Volkwagen',
 		'Ford Master NG',
-		'Russian Army Truck'
+		'Russian Army Truck',
+		
 	];
 
 	let numberOfOptions = 0;
@@ -763,6 +794,8 @@ function createButton(text, callback) {
 	document.body.appendChild(container);
 }
 
+
+
 // how do i use this button?
 createButton('Select Vehicle', (selectedOption) => {
 	console.log('Selected:', selectedOption);
@@ -781,7 +814,7 @@ createButton('Select Vehicle', (selectedOption) => {
 		createDropzone2('2020_mercedes-benz_g-class_amg_g_63.glb');
 		let specs = {
 			make: 'Mercedes-Benz',
-			model: 'G-Wagon',
+			model: 'G-Wagon SUV',
 			mileage: '20,000 km',
 			price: '$150,000',
 			driveType: 'AWD',
@@ -807,9 +840,39 @@ createButton('Select Vehicle', (selectedOption) => {
 			driveType: 'AWD',
 		};
 		createSpecsBox(specs);
+	} else if (selectedOption === 'Volkwagen') {
+		createDropzone2('volkwagen.glb');
+		let specs = {
+			make: 'Volkswagen',
+			model: 'Golf',
+			mileage: '50,000 km',
+			price: '$40,000',
+			driveType: 'AWD',
+		};
+		createSpecsBox(specs);
 	}
 });
 
+//create button to randomize the model	
+function createRandomizeButton() {
+	//the button should be on riht bottom of the screen
+	const button = document.createElement('button');
+	button.innerText = 'Randomize Model';
+	button.style.position = 'absolute';
+	button.style.bottom = '10px';
+	button.style.right = '10px';
+	button.style.zIndex = 1000;
+	button.style.padding = '8px';
+	button.style.cursor = 'pointer';
+	button.style.backgroundColor = 'black';
+	button.style.color = 'white';
+	button.onclick = () => {
+		randomizeModel();
+	};
+	document.body.appendChild(button);
+}
+createRandomizeButton();
+	
 
 //crete a text box show the cars specs Make: Toyota
 // Model: 2002
@@ -821,7 +884,7 @@ createButton('Select Vehicle', (selectedOption) => {
 function createSpecsBox(specs) {
 	const specsBox = document.createElement('div');
 	specsBox.style.position = 'absolute';
-	specsBox.style.top = '300px';
+	specsBox.style.bottom = '10px';
 	specsBox.style.left = '10px';
 	specsBox.style.zIndex = 1000;
 	specsBox.style.backgroundColor = 'black';
@@ -844,8 +907,8 @@ function createImage(imagePath) {
 	const image = document.createElement('img');
 	image.src = imagePath;
 	image.style.position = 'absolute';
-	image.style.top = '100px';
-	image.style.left = '10px';
+	image.style.top = '110px';
+	image.style.left = '200px';
 	image.style.zIndex = 1000;
 	image.style.cursor = 'grab';
 	image.style.width = '150px'; // default size
@@ -920,7 +983,7 @@ function createImage2(imagePath) {
 	image.src = imagePath;
 	image.style.position = 'absolute';
 	image.style.top = '100px';
-	image.style.left = '10px';
+	image.style.left = '110px';
 	image.style.zIndex = 1000;
 	image.style.cursor = 'grab';
 	image.style.width = '150px'; // default size
@@ -992,7 +1055,7 @@ function createImage3(imagePath) {
 	image.src = imagePath;
 	image.style.position = 'absolute';
 	image.style.top = '100px';
-	image.style.left = '10px';
+	image.style.right = '220px';
 	image.style.zIndex = 1000;
 	image.style.cursor = 'grab';
 	image.style.width = '150px'; // default size
@@ -1059,6 +1122,462 @@ function createImage3(imagePath) {
 	document.body.appendChild(image);
 }
 
+function createImagecanva() {
+	const image = document.createElement('canvas');
+	image.style.position = 'absolute';
+	image.id= "flowerCanvas"
+	image.style.top = '150px';
+	image.style.right = '10px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+	//float image to the left
+	image.style.float = 'left';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+
+function createImagecanva2() {
+	const image = document.createElement('canvas');
+	image.style.position = 'absolute';
+	image.id= "flowerCanvas2"
+	image.style.bottom = '100px';
+	image.style.right = '10px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+	//float image to the left
+	image.style.float = 'left';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+function createImagecanva3() {
+	const image = document.createElement('canvas');
+	image.style.position = 'absolute';
+	image.id= "flowerCanvas3"
+	image.style.bottom = '10px';
+	image.style.right = '100px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+	//float image to the left
+	image.style.float = 'left';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+
+function createImagecanva4() {
+	const image = document.createElement('canvas');
+	image.style.position = 'absolute';
+	image.id= "flowerCanvas4"
+	image.style.bottom = '100px';
+	image.style.right = '250px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+	//float image to the left
+	image.style.float = 'left';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+
+function createImagecanva5() {
+	const image = document.createElement('canvas');
+	image.style.position = 'absolute';
+	image.id= "flowerCanvas5"
+	image.style.top = '150px';
+	image.style.right = '100px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+	//float image to the left
+	image.style.float = 'left';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+
+function createImagecanva6() {
+	const image = document.createElement('canvas');
+	image.style.position = 'absolute';
+	image.id= "flowerCanvas6"
+	image.style.bottom = '100px';
+	image.style.right = '100px';
+	image.style.zIndex = 1000;
+	image.style.cursor = 'grab';
+	image.style.width = '150px'; // default size
+	image.style.height = 'auto';
+	image.style.userSelect = 'none';
+	//float image to the left
+	image.style.float = 'left';
+
+	let isDragging = false;
+	let offsetX = 0;
+	let offsetY = 0;
+
+	// Mouse down: start dragging
+	image.addEventListener('mousedown', (e) => {
+		isDragging = true;
+		offsetX = e.clientX - image.offsetLeft;
+		offsetY = e.clientY - image.offsetTop;
+		image.style.cursor = 'grabbing';
+	});
+
+	// Touch start: begin drag
+	image.addEventListener('touchstart', (e) => {
+		const touch = e.touches[0];
+		offsetX = touch.clientX - image.offsetLeft;
+		offsetY = touch.clientY - image.offsetTop;
+		isDragging = true;
+	});
+
+	// Touch move: move image
+	document.addEventListener('touchmove', (e) => {
+		if (isDragging) {
+			const touch = e.touches[0];
+			image.style.left = `${touch.clientX - offsetX}px`;
+			image.style.top = `${touch.clientY - offsetY}px`;
+		}
+	});
+
+	// Touch end: stop drag
+	document.addEventListener('touchend', () => {
+		isDragging = false;
+	});
+
+
+	// Mouse up: stop dragging
+	document.addEventListener('mouseup', () => {
+		isDragging = false;
+		image.style.cursor = 'grab';
+	});
+
+	// Mouse move: handle drag
+	document.addEventListener('mousemove', (e) => {
+		if (isDragging) {
+			image.style.left = `${e.clientX - offsetX}px`;
+			image.style.top = `${e.clientY - offsetY}px`;
+		}
+	});
+
+	// Scroll to resize
+	image.addEventListener('wheel', (e) => {
+		e.preventDefault();
+		const currentWidth = parseFloat(image.style.width);
+		const delta = e.deltaY > 0 ? -10 : 10;
+		const newWidth = Math.max(50, currentWidth + delta);
+		image.style.width = `${newWidth}px`;
+	});
+
+	document.body.appendChild(image);
+}
+
+ createImagecanva()
+ createImagecanva2()
+ createImagecanva3()
+ createImagecanva4()
+ createImagecanva5()
+ createImagecanva6()
+
 
 createImage("models/3d-flower.png");
 createImage2("models/close-up-colorful.png");
@@ -1084,8 +1603,9 @@ async function createDropzone2(fil0Path) {
 		fileMap.set(filePath, file);
 
 		// Call the load method with the fileMap
-		app.showSpinner();
+		
 		var app = window.VIEWER.app;
+		app.showSpinner();
 		app.load(fileMap);
 		app.hideSpinner();
 	} catch (error) {
@@ -1101,6 +1621,10 @@ function traverseMaterials(object, callback) {
 		materials.forEach(callback);
 	});
 }
+
+
+
+
 
 // https://stackoverflow.com/a/9039885/1314762
 function isIOS() {
